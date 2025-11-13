@@ -1,0 +1,22 @@
+<!-- templates/history.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="card-header">Discharge History</div>
+  <div class="card-body">
+    {% if history %}
+      <ul class="list-group">
+        {% for rec in history %}
+        <li class="list-group-item">
+          <strong>ID {{ rec.patient.id }} — {{ rec.patient.name }}</strong>
+          <div><small>{{ rec.patient.disease }} | priority {{ rec.patient.priority }}</small></div>
+          <div class="text-muted small">At {{ rec.time.strftime("%Y-%m-%d %H:%M:%S") }} — Reason: {{ rec.reason }}</div>
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No discharge history available.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

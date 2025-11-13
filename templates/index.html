@@ -1,0 +1,127 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-12">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">Add Patient</h5>
+        <form method="post" action="/add" class="row g-2">
+          <div class="col-md-4">
+            <input name="name" class="form-control" placeholder="Patient name" required />
+          </div>
+          <div class="col-md-4">
+            <input name="disease" class="form-control" placeholder="Disease / reason" required />
+          </div>
+          <div class="col-md-2">
+            <input name="priority" type="number" class="form-control" min="1" value="3" />
+          </div>
+          <div class="col-md-2">
+            <button class="btn btn-primary w-100" type="submit">Add Patient</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="col-md-4">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h6>Total Active</h6>
+        <h3>{{ active|length }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h6>Discharged</h6>
+        <h3>{{ discharged|length }}</h3>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-bg-light mb-3">
+      <div class="card-body">
+        <h6>Actions</h6>
+        <a class="btn btn-outline-secondary btn-sm" href="/history">View History</a>
+        <a class="btn btn-outline-secondary btn-sm" href="/export">Export CSV</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active & Discharged tables -->
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        Active Patients
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th><th>Name</th><th>Disease</th><th>Priority</th><th>Admitted</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in active %}
+            <tr>
+              <td>{{ p.id }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.disease }}</td>
+              <td>{{ p.priority }}</td>
+              <td>{{ p.admit_time.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+              <td>
+                <form method="post" action="/discharge/{{ p.id }}" class="d-inline">
+                  <input type="hidden" name="reason" value="">
+                  <button class="btn btn-sm btn-danger" type="submit">Discharge</button>
+                </form>
+              </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="text-center small text-muted">No active patients</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        Discharged Patients (top is last)
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr><th>ID</th><th>Name</th><th>Disease</th><th>Priority</th><th>DischargedAt</th></tr>
+          </thead>
+          <tbody>
+            {% for entry in discharged %}
+              {% set p = entry[0] %}
+              {% set t = entry[1] %}
+            <tr>
+              <td>{{ p.id }}</td>
+              <td>{{ p.name }}</td>
+              <td>{{ p.disease }}</td>
+              <td>{{ p.priority }}</td>
+              <td>{{ t.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="5" class="text-center small text-muted">No discharged patients</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer">
+        <form method="post" action="/undo" class="d-inline">
+          <button class="btn btn-outline-primary btn-sm" type="submit">Undo Last Discharge</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
